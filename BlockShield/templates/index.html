@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlockShield | Criminal Network Analysis</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://unpkg.com/cytoscape@3.30.4/dist/cytoscape.min.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="shield">◆</span> BlockShield</div>
+    <p class="subtitle">AI-Powered Criminal Network Analysis</p>
+    <nav>
+      <a class="active" href="#dashboard">Dashboard</a>
+      <a href="#network">Network Graph</a>
+      <a href="#suspects">Risk Analysis</a>
+      <a href="#data">Data Import</a>
+    </nav>
+    <div class="side-note">
+      <b>SIH26189</b>
+      <span>Blockchain & Cybersecurity</span>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">INVESTIGATOR CONSOLE</p>
+        <h1>Criminal Network Analysis</h1>
+        <p class="muted">Explore entities, relationships and suspicious activity from connected crime data.</p>
+      </div>
+      <button class="btn secondary" onclick="resetDemo()">Reset Demo</button>
+    </header>
+
+    <section id="dashboard" class="stats">
+      <div class="card stat"><span>Entities</span><strong id="entities">0</strong><small>People & locations</small></div>
+      <div class="card stat"><span>Relationships</span><strong id="relationships">0</strong><small>Observed connections</small></div>
+      <div class="card stat danger"><span>High-Risk Entities</span><strong id="highRisk">0</strong><small>Prototype risk score</small></div>
+      <div class="card stat"><span>Transaction Value</span><strong id="totalValue">₹0</strong><small>Imported records</small></div>
+    </section>
+
+    <section id="network" class="grid-two">
+      <div class="card graph-card">
+        <div class="section-title">
+          <div><h2>Relationship Network</h2><p>Connected entities and observed interactions</p></div>
+          <span class="pill">LIVE ANALYSIS</span>
+        </div>
+        <div id="cy"></div>
+      </div>
+
+      <div id="suspects" class="card">
+        <div class="section-title">
+          <div><h2>Risk Analysis</h2><p>Entities ranked by connectivity and transaction value</p></div>
+        </div>
+        <div id="peopleList" class="people-list"></div>
+      </div>
+    </section>
+
+    <section id="data" class="card import-card">
+      <div>
+        <h2>Import Crime Relationship Data</h2>
+        <p class="muted">Upload a CSV with <code>source,target,relation,amount</code>.</p>
+        <p class="hint">Example: <code>Ravi,Kumar,money_transfer,75000</code></p>
+      </div>
+      <label class="upload">
+        <input id="csvFile" type="file" accept=".csv">
+        Choose CSV
+      </label>
+      <button class="btn" onclick="uploadCSV()">Analyse Data</button>
+      <div id="message" class="message"></div>
+    </section>
+
+    <footer>
+      BlockShield prototype • For demonstration and research purposes
+    </footer>
+  </main>
+
+<script>
+let cy;
+
+async function getAnalysis() {
+  const res = await fetch("/api/analysis");
+  const data = await res.json();
+  render(data);
+}
+
+function render(data) {
+  document.getElementById("entities").textContent = data.stats.entities;
+  document.getElementById("relationships").textContent = data.stats.relationships;
+  document.getElementById("highRisk").textContent = data.stats.high_risk;
+  document.getElementById("totalValue").textContent =
+    "₹" + Number(data.stats.total_value).toLocaleString("en-IN");
+
+  const list = document.getElementById("peopleList");
+  list.innerHTML = data.people.map(p => `
+    <div class="person">
+      <div class="person-main">
+        <div class="avatar">${p.name.charAt(0).toUpperCase()}</div>
+        <div>
+          <b>${escapeHtml(p.name)}</b>
+          <span>${p.connections} connections • ₹${Number(p.transaction_value).toLocaleString("en-IN")}</span>
+        </div>
+      </div>
+      <div class="risk ${p.risk_level.toLowerCase()}">${p.risk_level}<br><strong>${p.risk_score}</strong></div>
+    </div>
+  `).join("");
+
+  if (cy) cy.destroy();
+  cy = cytoscape({
+    container: document.getElementById("cy"),
+    elements: [...data.nodes, ...data.edges],
+    style: [
+      { selector: "node", style: {
+        "background-color": "#7c3aed", "label": "data(label)",
+        "color": "#e5e7eb", "font-size": "11px", "text-valign":"bottom",
+        "text-margin-y": "7px", "width": 28, "height": 28
+      }},
+      { selector: "edge", style: {
+        "line-color": "#475569", "target-arrow-color":"#64748b",
+        "target-arrow-shape":"triangle", "curve-style":"bezier",
+        "width": 2, "label":"data(label)", "color":"#94a3b8",
+        "font-size":"8px", "text-background-color":"#111827",
+        "text-background-opacity":1, "text-background-padding":"2px"
+      }}
+    ],
+    layout: { name:"cose", animate:true, padding:35 }
+  });
+}
+
+async function uploadCSV() {
+  const file = document.getElementById("csvFile").files[0];
+  if (!file) return showMessage("Select a CSV file first.", true);
+
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch("/api/upload", {method:"POST", body:form});
+  const data = await res.json();
+  if (!res.ok) return showMessage(data.error || "Upload failed.", true);
+
+  render(data.analysis);
+  showMessage(data.message, false);
+}
+
+async function resetDemo() {
+  const res = await fetch("/api/reset", {method:"POST"});
+  const data = await res.json();
+  render(data.analysis);
+  showMessage(data.message, false);
+}
+
+function showMessage(text, error) {
+  const el = document.getElementById("message");
+  el.textContent = text;
+  el.className = "message " + (error ? "error" : "success");
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[m]));
+}
+
+getAnalysis();
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+* { box-sizing: border-box; }
+body {
+  margin:0; font-family: Inter, Segoe UI, Arial, sans-serif;
+  background:#080d18; color:#e5e7eb; display:flex; min-height:100vh;
+}
+.sidebar {
+  width:245px; background:#0c1220; border-right:1px solid #1e293b;
+  padding:28px 20px; position:fixed; top:0; bottom:0;
+}
+.brand { font-size:22px; font-weight:800; letter-spacing:.2px; }
+.shield { color:#8b5cf6; margin-right:8px; }
+.subtitle { color:#64748b; font-size:12px; line-height:1.5; margin:7px 5px 35px; }
+nav a {
+  display:block; color:#94a3b8; text-decoration:none; padding:12px 13px;
+  border-radius:9px; margin:5px 0; font-size:14px;
+}
+nav a:hover, nav a.active { background:#182033; color:#fff; }
+.side-note {
+  position:absolute; bottom:25px; left:20px; right:20px; padding:14px;
+  border:1px solid #263247; border-radius:10px; background:#101827;
+}
+.side-note b { display:block; color:#a78bfa; font-size:12px; }
+.side-note span { display:block; color:#64748b; font-size:11px; margin-top:4px; }
+main { margin-left:245px; padding:34px; width:calc(100% - 245px); }
+header { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; }
+.eyebrow { color:#8b5cf6; font-size:11px; font-weight:700; letter-spacing:1.5px; }
+h1 { margin:5px 0 6px; font-size:30px; }
+h2 { margin:0; font-size:17px; }
+.muted, .section-title p { color:#64748b; font-size:12px; margin:7px 0 0; }
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px; }
+.card { background:#0e1625; border:1px solid #1e293b; border-radius:12px; padding:20px; }
+.stat span { color:#94a3b8; font-size:12px; }
+.stat strong { display:block; font-size:28px; margin:9px 0 5px; }
+.stat small { color:#475569; }
+.stat.danger strong { color:#fb7185; }
+.grid-two { display:grid; grid-template-columns:1.5fr 1fr; gap:16px; margin-bottom:16px; }
+.graph-card { min-height:500px; }
+.section-title { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; }
+.pill { font-size:9px; color:#c4b5fd; background:#21163d; padding:6px 8px; border-radius:20px; }
+#cy { height:405px; border:1px solid #1e293b; border-radius:9px; background:#090f1b; }
+.people-list { max-height:405px; overflow:auto; }
+.person {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 0; border-bottom:1px solid #1e293b;
+}
+.person-main { display:flex; align-items:center; gap:10px; }
+.avatar {
+  width:32px; height:32px; border-radius:50%; background:#1d2540;
+  display:grid; place-items:center; color:#c4b5fd; font-weight:700; font-size:12px;
+}
+.person b { display:block; font-size:13px; }
+.person span { color:#64748b; font-size:10px; }
+.risk { text-align:right; font-size:9px; }
+.risk strong { font-size:13px; }
+.risk.high { color:#fb7185; }
+.risk.medium { color:#fbbf24; }
+.risk.low { color:#34d399; }
+.import-card { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.import-card > div:first-child { flex:1; min-width:250px; }
+code { color:#c4b5fd; background:#151d2c; padding:2px 5px; border-radius:4px; }
+.hint { font-size:11px; color:#475569; }
+.upload, .btn {
+  border:1px solid #334155; border-radius:8px; padding:10px 15px;
+  background:#182235; color:#e2e8f0; cursor:pointer; font-size:12px;
+}
+.upload input { display:none; }
+.btn { background:#7c3aed; border-color:#7c3aed; font-weight:700; }
+.btn:hover { opacity:.9; }
+.btn.secondary { background:#111827; border-color:#334155; }
+.message { width:100%; font-size:12px; }
+.success { color:#34d399; }
+.error { color:#fb7185; }
+footer { color:#475569; font-size:10px; padding:20px 0; text-align:center; }
+
+@media (max-width: 900px) {
+  .sidebar { position:static; width:190px; }
+  main { margin-left:0; width:calc(100% - 190px); padding:20px; }
+  .stats { grid-template-columns:repeat(2,1fr); }
+  .grid-two { grid-template-columns:1fr; }
+}
+@media (max-width: 600px) {
+  body { display:block; }
+  .sidebar { width:100%; position:static; }
+  .side-note { display:none; }
+  main { width:100%; }
+  header { align-items:flex-start; gap:10px; }
+  .stats { grid-template-columns:1fr 1fr; }
+}

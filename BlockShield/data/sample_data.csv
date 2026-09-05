@@ -1,0 +1,8 @@
+source,target,relation,amount
+Arun,Ravi,phone,0
+Ravi,Kumar,money_transfer,75000
+Kumar,Suresh,money_transfer,125000
+Ravi,Chennai,location,0
+Arun,Kumar,phone,0
+Suresh,Ravi,phone,0
+Kumar,Mohan,money_transfer,250000
